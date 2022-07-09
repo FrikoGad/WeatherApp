@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens
+package com.example.weatherapp.screens.main
 
 import android.Manifest
 import android.os.Bundle
@@ -7,14 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
-import com.example.weatherapp.R
 import com.example.weatherapp.adapters.ViewPagerAdapter
 import com.example.weatherapp.databinding.FragmentMainBinding
+import com.example.weatherapp.screens.days.DaysFragment
+import com.example.weatherapp.screens.hours.HoursFragment
 import com.example.weatherapp.utils.isPermissionGranted
 import com.google.android.material.tabs.TabLayoutMediator
 

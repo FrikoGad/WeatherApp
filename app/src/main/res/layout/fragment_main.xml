@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".screens.MainFragment">
+    tools:context=".screens.main.MainFragment">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -81,7 +81,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_city" />
 
             <TextView
-                android:id="@+id/tv_condition"
+                android:id="@+id/item_condition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/aubrey"
@@ -102,7 +102,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_condition" />
+                app:layout_constraintTop_toBottomOf="@+id/item_condition" />
 
             <ImageButton
                 android:id="@+id/ib_search"
@@ -114,7 +114,7 @@
                 android:src="@drawable/ic_search"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_condition" />
+                app:layout_constraintTop_toBottomOf="@+id/item_condition" />
 
             <ImageButton
                 android:id="@+id/ib_sync"

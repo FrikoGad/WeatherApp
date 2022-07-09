@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens
+package com.example.weatherapp.screens.days
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
