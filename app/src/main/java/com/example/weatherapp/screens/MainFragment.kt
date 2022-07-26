@@ -8,20 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.weatherapp.R
 import com.example.weatherapp.adapters.ViewPagerAdapter
+import com.example.weatherapp.data.WeatherModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.example.weatherapp.utils.API_KEY
 import com.example.weatherapp.utils.isPermissionGranted
 import com.google.android.material.tabs.TabLayoutMediator
+import org.json.JSONObject
 
 class MainFragment : Fragment() {
     private val fragmentList = listOf(
@@ -49,42 +48,60 @@ class MainFragment : Fragment() {
         init()
     }
 
-    private fun init() = with(binding){
+    private fun init() = with(binding) {
         val adapter = ViewPagerAdapter(activity as FragmentActivity, fragmentList)
         vp.adapter = adapter
-        TabLayoutMediator(tabLayout, vp) {
-            tab, position -> tab.text = tabList[position]
+        TabLayoutMediator(tabLayout, vp) { tab, position ->
+            tab.text = tabList[position]
         }.attach()
     }
 
     private fun permissionListener() {
         pLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()) {
-                Toast.makeText(activity, "Permission is $it", Toast.LENGTH_SHORT).show()
+            ActivityResultContracts.RequestPermission()
+        ) {
+            Toast.makeText(activity, "Permission is $it", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun checkPermission() {
-        if(!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionListener()
             pLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
     private fun requestWeatherData(city: String) {
-        val url = "https://api.weatherapi.com/v1/forecast.json?key=$API_KEY&q=$city&days=5&aqi=no&alerts=no"
+        val url =
+            "https://api.weatherapi.com/v1/forecast.json?key=$API_KEY&q=$city&days=5&aqi=no&alerts=no"
         val queue = Volley.newRequestQueue(context)
         val request = StringRequest(
             Request.Method.GET,
             url,
-            {
-                result -> Log.d("MyLog", "Result: $result")
+            { result ->
+                parseWeatherData(result)
             },
-            {
-                error -> Log.d("MyLog", "Error: $error")
+            { error ->
+                Log.d("MyLog", "Error: $error")
             }
         )
         queue.add(request)
+    }
+
+    private fun parseWeatherData(result: String) {
+        val responseObject = JSONObject(result)
+        val item = WeatherModel(
+            responseObject.getJSONObject("location").getString("name"),
+            responseObject.getJSONObject("current").getString("last_updated"),
+            responseObject.getJSONObject("current")
+                .getJSONObject("condition").getString("text"),
+            responseObject.getJSONObject("current")
+                .getJSONObject("condition").getString("icon"),
+            responseObject.getJSONObject("current").getString("temp_c"),
+            "",
+            "",
+            ""
+        )
     }
 
     companion object {
