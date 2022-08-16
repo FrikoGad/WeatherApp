@@ -11,15 +11,18 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weatherapp.MainViewModel
 import com.example.weatherapp.adapters.ViewPagerAdapter
 import com.example.weatherapp.data.WeatherModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.example.weatherapp.utils.API_KEY
 import com.example.weatherapp.utils.isPermissionGranted
 import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
 class MainFragment : Fragment() {
@@ -33,6 +36,7 @@ class MainFragment : Fragment() {
     )
     private lateinit var pLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
+    private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +50,8 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         init()
+        updateCurrentCard()
+        requestWeatherData("Omsk")
     }
 
     private fun init() = with(binding) {
@@ -54,6 +60,18 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) { tab, position ->
             tab.text = tabList[position]
         }.attach()
+    }
+
+    private fun updateCurrentCard() = with(binding) {
+        viewModel.liveDataCurrent.observe(viewLifecycleOwner) {
+            val maxMinTemp = "${it.maxTemp}°C/${it.minTemp}°C"
+            tvData.text = it.time
+            tvCity.text = it.city
+            tvCurrentTemp.text = "${it.currentTemp}°C"
+            tvCondition.text = it.condition
+            tvMaxMin.text = maxMinTemp
+            Picasso.get().load("https:" + it.imgUrl).into(imgWeather)
+        }
     }
 
     private fun permissionListener() {
@@ -131,6 +149,7 @@ class MainFragment : Fragment() {
             weatherItem.minTemp,
             weatherItem.hours
         )
+        viewModel.liveDataCurrent.value = item
     }
 
     companion object {
