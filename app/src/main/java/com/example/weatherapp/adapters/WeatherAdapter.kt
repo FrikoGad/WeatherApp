@@ -18,7 +18,8 @@ class WeatherAdapter : ListAdapter<WeatherModel, WeatherAdapter.ViewHolder>(Comp
         fun bind(item: WeatherModel) = with(binding) {
             tvDate.text = item.time
             tvCondition.text = item.condition
-            tvTemp.text = "${item.currentTemp}°C"
+            tvTemp.text =
+                "${item.currentTemp.ifEmpty { "${item.maxTemp}°C / ${item.minTemp}°C" }}°C"
             Picasso.get().load("https:" + item.imgUrl).into(ivCondition)
         }
     }
@@ -35,7 +36,7 @@ class WeatherAdapter : ListAdapter<WeatherModel, WeatherAdapter.ViewHolder>(Comp
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
         return ViewHolder(view)
     }
 

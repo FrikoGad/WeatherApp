@@ -91,7 +91,7 @@ class MainFragment : Fragment() {
 
     private fun requestWeatherData(city: String) {
         val url =
-            "https://api.weatherapi.com/v1/forecast.json?key=$API_KEY&q=$city&days=5&aqi=no&alerts=no"
+            "https://api.weatherapi.com/v1/forecast.json?key=$API_KEY&q=$city&days=3&aqi=no&alerts=no"
         val queue = Volley.newRequestQueue(context)
         val request = StringRequest(
             Request.Method.GET,
@@ -133,6 +133,7 @@ class MainFragment : Fragment() {
             )
             list.add(item)
         }
+        viewModel.liveDataList.value = list
         return list
     }
 
