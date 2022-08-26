@@ -64,12 +64,12 @@ class MainFragment : Fragment() {
 
     private fun updateCurrentCard() = with(binding) {
         viewModel.liveDataCurrent.observe(viewLifecycleOwner) {
-            val maxMinTemp = "${it.maxTemp}°C/${it.minTemp}°C"
+            val maxMinTemp = "${it.maxTemp}°C / ${it.minTemp}°C"
             tvData.text = it.time
             tvCity.text = it.city
-            tvCurrentTemp.text = "${it.currentTemp}°C"
+            tvCurrentTemp.text = it.currentTemp.ifEmpty {maxMinTemp}
             tvCondition.text = it.condition
-            tvMaxMin.text = maxMinTemp
+            tvMaxMin.text = if (it.currentTemp.isEmpty()) "" else maxMinTemp
             Picasso.get().load("https:" + it.imgUrl).into(imgWeather)
         }
     }
@@ -127,8 +127,8 @@ class MainFragment : Fragment() {
                 day.getJSONObject("day").getJSONObject("condition")
                     .getString("icon"),
                 "",
-                day.getJSONObject("day").getString("maxtemp_c"),
-                day.getJSONObject("day").getString("mintemp_c"),
+                day.getJSONObject("day").getString("maxtemp_c").toFloat().toInt().toString(),
+                day.getJSONObject("day").getString("mintemp_c").toFloat().toInt().toString(),
                 day.getJSONArray("hour").toString()
             )
             list.add(item)

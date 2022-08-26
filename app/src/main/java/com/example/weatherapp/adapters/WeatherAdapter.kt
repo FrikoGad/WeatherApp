@@ -11,11 +11,18 @@ import com.example.weatherapp.data.WeatherModel
 import com.example.weatherapp.databinding.ListItemBinding
 import com.squareup.picasso.Picasso
 
-class WeatherAdapter : ListAdapter<WeatherModel, WeatherAdapter.ViewHolder>(Comparator()) {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class WeatherAdapter(val listener: Listener?) : ListAdapter<WeatherModel, WeatherAdapter.ViewHolder>(Comparator()) {
+    class ViewHolder(view: View, val listener: Listener?) : RecyclerView.ViewHolder(view) {
         private val binding = ListItemBinding.bind(view)
+        var itemTemp: WeatherModel? = null
+        init {
+            itemView.setOnClickListener {
+                itemTemp?.let { it1 -> listener?.onClick(it1) }
+            }
+        }
 
         fun bind(item: WeatherModel) = with(binding) {
+            itemTemp = item
             tvDate.text = item.time
             tvCondition.text = item.condition
             tvTemp.text =
@@ -37,10 +44,14 @@ class WeatherAdapter : ListAdapter<WeatherModel, WeatherAdapter.ViewHolder>(Comp
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, listener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    interface Listener {
+        fun onClick(item: WeatherModel)
     }
 }
