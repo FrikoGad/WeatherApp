@@ -2,8 +2,10 @@ package com.example.weatherapp.screens
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -22,6 +24,7 @@ import com.example.weatherapp.adapters.ViewPagerAdapter
 import com.example.weatherapp.data.WeatherModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.example.weatherapp.utils.API_KEY
+import com.example.weatherapp.utils.DialogManager
 import com.example.weatherapp.utils.isPermissionGranted
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -59,7 +62,11 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
-        getLocation()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocation()
     }
 
     private fun init() = with(binding) {
@@ -71,12 +78,21 @@ class MainFragment : Fragment() {
         }.attach()
         ibSync.setOnClickListener {
             tabLayout.selectTab(tabLayout.getTabAt(0))
-            getLocation()
+            checkLocation()
         }
     }
 
     private fun checkLocation() {
+        if (isLocationEnabled()) {
+            getLocation()
+        } else {
+            DialogManager.locationSettingsDialog(requireContext(), object : DialogManager.Listener {
+                override fun onClick() {
+                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
 
+            })
+        }
     }
 
     private fun isLocationEnabled(): Boolean {
@@ -85,10 +101,6 @@ class MainFragment : Fragment() {
     }
 
     private fun getLocation() {
-        if (!isLocationEnabled()) {
-            Toast.makeText(requireContext(), "Location disabled!", Toast.LENGTH_SHORT).show()
-            return
-        }
         val ct = CancellationTokenSource()
         fLocationClient
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, ct.token)
