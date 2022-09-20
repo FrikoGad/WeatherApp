@@ -21,11 +21,16 @@ import com.example.weatherapp.data.WeatherModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.example.weatherapp.utils.API_KEY
 import com.example.weatherapp.utils.isPermissionGranted
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
 class MainFragment : Fragment() {
+    private lateinit var fLocationClient: FusedLocationProviderClient
     private val fragmentList = listOf(
         HoursFragment.newInstance(),
         DaysFragment.newInstance()
@@ -51,15 +56,29 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
-        requestWeatherData("Omsk")
+        getLocation()
     }
 
     private fun init() = with(binding) {
+        fLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = ViewPagerAdapter(activity as FragmentActivity, fragmentList)
         vp.adapter = adapter
         TabLayoutMediator(tabLayout, vp) { tab, position ->
             tab.text = tabList[position]
         }.attach()
+        ibSync.setOnClickListener {
+            tabLayout.selectTab(tabLayout.getTabAt(0))
+            getLocation()
+        }
+    }
+
+    private fun getLocation() {
+        val ct = CancellationTokenSource()
+        fLocationClient
+            .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, ct.token)
+            .addOnCompleteListener {
+                requestWeatherData("${it.result.latitude}, ${it.result.longitude}")
+            }
     }
 
     private fun updateCurrentCard() = with(binding) {
